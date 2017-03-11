@@ -7,7 +7,7 @@ class ReaderService:
     def __init__(self):
         self.conversation_labels = {}
         self.conversation_text = {}
-        self.RESOURCE_DIR = "../resources/"
+        self.RESOURCE_DIR = os.path.dirname(os.path.abspath(__file__)) + "/../../resources/"
         self.LABELS_DIR = self.RESOURCE_DIR + "labels/"
         self.CONVERSATIONS_DIR = self.RESOURCE_DIR + "conversations/"
 
@@ -59,7 +59,7 @@ class ReaderService:
             for post in posts:
                 text = post.find('body').text
                 if text is not None:
-                    all_text += text
+                    all_text += text.lower()
             self.conversation_text[float(".".join(filename.split(".")[0:2]))] = all_text
         except:
             print("Couldn't parse ", filename)

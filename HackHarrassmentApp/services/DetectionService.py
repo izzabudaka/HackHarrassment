@@ -13,8 +13,9 @@ class DetectionService:
         self.labels = reader.read_bad_words()
 
     def is_harrassment(self, text):
+        text = text.lower()
         tokens = word_tokenize(text)
         labels = text_mining.get_label(tokens, self.labels)
-        self.model.test(" ".join(tokens), " ".join(labels))
-        topic_dist = self.model.results(" ".join(labels))
-        return classifer.classify(topic_dist)
+        self.model.test([" ".join(tokens)], [" ".join(labels)])
+        _, topic_dist = self.model.results([" ".join(labels)])
+        return classifer.classify(topic_dist)[0]

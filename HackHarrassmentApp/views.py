@@ -7,12 +7,15 @@ from HackHarrassmentApp.services.ReaderService import ReaderService
 from HackHarrassmentApp.services.ChatService import ChatService
 
 model = Model()
+model.clean()
 detection_service = DetectionService(model.get_model())
 reader = ReaderService()
 chat_service = ChatService()
 
+
 def index(request):
     return HttpResponse(detection_service.is_harrassment("Fuck You"))
+
 
 def create_user(request):
     return HttpResponse(chat_service.add_user("Alex"))
