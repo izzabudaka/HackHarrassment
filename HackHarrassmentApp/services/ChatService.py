@@ -78,5 +78,40 @@ class ChatService:
         conn.close()
         return result
 
+    def insert_message(self, sender, receiver, message):
+        if self.user_exists(receiver) is None or self.user_exists(sender) is None:
+            return
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender, receiver, message, ))
+        row_id = c.lastrowid
+        conn.commit()
+        conn.close()
+
+        self.create_relation_node(sender, receiver)
+        return row_id
+
+    def set_user_tagged(self, user_id):
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `id` = ?", (user_id, ))
+        conn.commit()
+        conn.close()
+
+
     def get_conn(self):
         return sqlite3.connect('db.sqlite3')
+
+    def get_last_message_id(self):
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("SELECT `id` FROM `chat_messages` ORDER BY `id` DESC LIMIT 1")
+        row_id = c.fetchone()
+        if row_id is None:
+            row_id = 0
+        conn.close()
+        return row_id
+

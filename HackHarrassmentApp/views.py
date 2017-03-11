@@ -40,7 +40,9 @@ def get_users(request):
 
 
 def get_latest_messages(request):
-    row_id = request.GET.get('last_msg', 4294967295)
+    row_id = request.GET.get('last_msg')
+    if row_id is None:
+        return HttpResponse(chat_service.get_last_message_id())
     result = chat_service.get_messages_after(row_id)
     messages = []
     for message in result:
@@ -51,3 +53,36 @@ def get_latest_messages(request):
             'msg': message[3]
         })
     return HttpResponse(json.dumps(messages))
+
+
+def post_message(request):
+    sender = request.POST.get('sender')
+    message = request.POST.get('message')
+
+    if sender is None:
+        return HttpResponse('Sender not defined')
+    if message is None:
+        return HttpResponse('Message not defined')
+
+    if chat_service.user_exists(sender) is None:
+        return HttpResponse('That user does not exist')
+
+    str_data = unicode.split(message)
+
+    if len(str_data) < 2:
+        return HttpResponse("Invalid message")
+
+    receiver = str_data[0]
+    message = ' '.join(str_data[1:])
+
+    if receiver[:1] != '@':
+        return HttpResponse("Invalid receiver")
+    receiver = receiver[1:]
+
+    if chat_service.user_exists(receiver) is None:
+        return HttpResponse('Receiver does not exist')
+
+    return HttpResponse(chat_service.insert_message(sender, receiver, message))
+
+
+
