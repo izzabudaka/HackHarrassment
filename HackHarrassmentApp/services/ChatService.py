@@ -12,6 +12,8 @@ class ChatService:
             c.execute("INSERT OR IGNORE INTO `chat_users`(`name`) VALUES(?)", (name,))
             rowid = c.lastrowid
             conn.commit()
+            c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (rowid, rowid,))
+            conn.commit()
             conn.close()
         else:
             rowid = exists
@@ -38,7 +40,10 @@ class ChatService:
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (user1, user2, ))
+        user_id1 = self.user_exists(user1)
+        user_id2 = self.user_exists(user2)
+
+        c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (user_id1, user_id2, ))
         conn.commit()
         conn.close()
 
@@ -78,13 +83,26 @@ class ChatService:
         conn.close()
         return result
 
+    def latest_messages(self):
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("SELECT `id`, `sender`, `receiver`, `message` FROM `chat_messages` ORDER BY `id` DESC LIMIT 3")
+        result = c.fetchall()
+        conn.close()
+        return result
+
     def insert_message(self, sender, receiver, message):
         if self.user_exists(receiver) is None or self.user_exists(sender) is None:
             return
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender, receiver, message, ))
+        sender_id = self.user_exists(sender)
+        receiver_id = self.user_exists(receiver)
+
+        c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender_id, receiver_id, message, ))
+
         row_id = c.lastrowid
         conn.commit()
         conn.close()
@@ -92,11 +110,11 @@ class ChatService:
         self.create_relation_node(sender, receiver)
         return row_id
 
-    def set_user_tagged(self, user_id):
+    def set_user_tagged(self, user_name):
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `id` = ?", (user_id, ))
+        c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `name` = ?", (user_name, ))
         conn.commit()
         conn.close()
 
