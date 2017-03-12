@@ -21,7 +21,10 @@ def index(request):
 
 
 def create_user(request):
-    return HttpResponse(chat_service.add_user("Alex"))
+    user = request.POST.get("name")
+    if user is None:
+        return HttpResponse('User name not set')
+    return HttpResponse(chat_service.add_user(user))
 
 
 def get_relations(request):
