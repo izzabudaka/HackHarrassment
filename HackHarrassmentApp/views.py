@@ -21,7 +21,7 @@ def index(request):
 
 
 def create_user(request):
-    user = request.POST.get("name")
+    user = "".join(request.POST.get("name").split())
     if user is None:
         return HttpResponse('User name not set')
     return HttpResponse(chat_service.add_user(user))
