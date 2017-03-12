@@ -117,7 +117,6 @@ class ChatService:
         conn.commit()
         conn.close()
 
-
     def get_conn(self):
         return sqlite3.connect('db.sqlite3')
 

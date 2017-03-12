@@ -96,12 +96,17 @@ def post_message(request):
     receiver = str_data[0]
     message = ' '.join(str_data[1:])
 
-    if receiver[:1] != '@':
+    if receiver[:1] != '@' and receiver[:1] != '+':
         return HttpResponse("Invalid receiver")
-    receiver = receiver[1:]
+    is_phone = receiver[:1] == '+'
+    if not is_phone:
+        receiver = receiver[1:]
 
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
+
+    if is_phone:
+        twilio_service.send_sms(receiver, message)
 
     is_tagged = detection_service.is_harrassment(message)
     row_id = chat_service.insert_message(sender, receiver, message)
@@ -116,11 +121,50 @@ def post_message(request):
 
     return HttpResponse(json.dumps(response))
 
+
 def on_incoming_sms(request):
     print(request.POST)
-    print(request.GET)
-    number = request.POST.get("number", "+447706677871")
-    body = request.POST.get("body", "I love you <3")
-    #message = twilio_service.send_sms(number, body)
-    return HttpResponse('das')
+
+    sender = request.POST.get('From')
+    message = request.POST.get('Body')
+
+    if sender is None or message is None:
+        return
+
+    if sender is None:
+        return
+    if message is None:
+        return
+
+    str_data = str.split(message)
+
+    if len(str_data) < 2:
+        return
+
+    receiver = str_data[0]
+    message = ' '.join(str_data[1:])
+
+    if receiver[:1] != '@' and receiver[:1] != '+':
+        return
+    is_phone = receiver[:1] == '+'
+    if not is_phone:
+        receiver = receiver[1:]
+
+    if chat_service.user_exists(receiver) is None:
+        return
+
+    if is_phone:
+        twilio_service.send_sms(receiver, message)
+
+    if chat_service.user_exists(receiver) is None:
+        return
+
+    is_tagged = detection_service.is_harrassment(message)
+    chat_service.insert_message(sender, receiver, message)
+
+    if is_tagged == 1:
+        chat_service.set_user_tagged(sender)
+
+    chat_service.process_sms(sender, message)
+    return HttpResponse('')
 
