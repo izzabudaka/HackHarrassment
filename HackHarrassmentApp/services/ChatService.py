@@ -9,10 +9,11 @@ class ChatService:
         exists = self.user_exists(name)
 
         if exists is None:
-            c.execute("INSERT OR IGNORE INTO `chat_users`(`name`) VALUES(?)", (name,))
+            c.execute("INSERT OR IGNORE INTO `chat_users`(`name`) VALUES(?)", (name, ))
             rowid = c.lastrowid
             conn.commit()
-            c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (rowid, rowid,))
+            rowid2 = rowid
+            c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (rowid, rowid2, ))
             conn.commit()
             conn.close()
         else:
@@ -40,8 +41,8 @@ class ChatService:
         conn = self.get_conn()
         c = conn.cursor()
 
-        user_id1 = self.user_exists(user1)
-        user_id2 = self.user_exists(user2)
+        user_id1 = self.user_exists(user1)[0]
+        user_id2 = self.user_exists(user2)[0]
 
         c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (user_id1, user_id2, ))
         conn.commit()
@@ -98,8 +99,9 @@ class ChatService:
         conn = self.get_conn()
         c = conn.cursor()
 
-        sender_id = self.user_exists(sender)
-        receiver_id = self.user_exists(receiver)
+        sender_id = self.user_exists(sender)[0]
+        print(sender_id)
+        receiver_id = self.user_exists(receiver)[0]
 
         c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender_id, receiver_id, message, ))
 
@@ -117,7 +119,6 @@ class ChatService:
         c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `name` = ?", (user_name, ))
         conn.commit()
         conn.close()
-
 
     def get_conn(self):
         return sqlite3.connect('db.sqlite3')
