@@ -22,6 +22,10 @@ def index(request):
     return HttpResponse(detection_service.is_harrassment(request.POST.get("txt")))
 
 
+def lol(request):
+    return HttpResponse(1)
+
+
 def create_user(request):
     user = "".join(request.POST.get("name").split())
     if user is None:
@@ -63,8 +67,6 @@ def get_latest_messages(request):
     return HttpResponse(json.dumps(messages))
 
 
-<<<<<<< HEAD
-=======
 def last_messages(request):
     result = chat_service.latest_messages()
     messages = []
@@ -78,7 +80,6 @@ def last_messages(request):
     return HttpResponse(json.dumps(messages))
 
 
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
 def post_message(request):
     sender = request.POST.get('sender')
     message = request.POST.get('message')
@@ -91,11 +92,7 @@ def post_message(request):
     if chat_service.user_exists(sender) is None:
         return HttpResponse('That user does not exist')
 
-<<<<<<< HEAD
-    str_data = unicode.split(message)
-=======
     str_data = str.split(message)
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
 
     if len(str_data) < 2:
         return HttpResponse("Invalid message")
@@ -110,11 +107,6 @@ def post_message(request):
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
-<<<<<<< HEAD
-    return HttpResponse(chat_service.insert_message(sender, receiver, message))
-
-
-=======
     is_tagged = detection_service.is_harrassment(message)
     row_id = chat_service.insert_message(sender, receiver, message)
 
@@ -128,10 +120,9 @@ def post_message(request):
 
     return HttpResponse(json.dumps(response))
 
+
 def on_incoming_sms(request):
     number = request.POST.get("number", "+447706677871")
     body = request.POST.get("body", "I love you <3")
     message = twilio_service.send_sms(number, body)
     return HttpResponse(message)
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
-
