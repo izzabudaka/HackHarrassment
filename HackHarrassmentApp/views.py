@@ -1,4 +1,3 @@
-from __builtin__ import unicode
 from django.http import HttpResponse
 import json
 
@@ -74,7 +73,7 @@ def post_message(request):
     if chat_service.user_exists(sender) is None:
         return HttpResponse('That user does not exist')
 
-    str_data = unicode.split(message)
+    str_data = str.split(message)
 
     if len(str_data) < 2:
         return HttpResponse("Invalid message")
@@ -89,7 +88,18 @@ def post_message(request):
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
-    return HttpResponse(chat_service.insert_message(sender, receiver, message))
+    is_tagged = detection_service.is_harrassment(message)
+    row_id = chat_service.insert_message(sender, receiver, message)
+
+    if is_tagged == 1:
+        chat_service.set_user_tagged(sender)
+
+    response = {
+        'id': row_id,
+        'tagged': is_tagged
+    }
+
+    return HttpResponse(json.dumps(response))
 
 
 

@@ -93,11 +93,11 @@ class ChatService:
         self.create_relation_node(sender, receiver)
         return row_id
 
-    def set_user_tagged(self, user_id):
+    def set_user_tagged(self, user_name):
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `id` = ?", (user_id, ))
+        c.execute("UPDATE `chat_users` SET `tagged` = 1 WHERE `name` = ?", (user_name, ))
         conn.commit()
         conn.close()
 
