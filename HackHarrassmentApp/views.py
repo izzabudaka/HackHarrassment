@@ -1,3 +1,4 @@
+from __builtin__ import unicode
 from django.http import HttpResponse
 import json
 
