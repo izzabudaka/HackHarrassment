@@ -63,8 +63,6 @@ def get_latest_messages(request):
     return HttpResponse(json.dumps(messages))
 
 
-<<<<<<< HEAD
-=======
 def last_messages(request):
     result = chat_service.latest_messages()
     messages = []
@@ -78,7 +76,6 @@ def last_messages(request):
     return HttpResponse(json.dumps(messages))
 
 
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
 def post_message(request):
     sender = request.POST.get('sender')
     message = request.POST.get('message')
@@ -91,11 +88,7 @@ def post_message(request):
     if chat_service.user_exists(sender) is None:
         return HttpResponse('That user does not exist')
 
-<<<<<<< HEAD
-    str_data = unicode.split(message)
-=======
     str_data = str.split(message)
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
 
     if len(str_data) < 2:
         return HttpResponse("Invalid message")
@@ -103,18 +96,23 @@ def post_message(request):
     receiver = str_data[0]
     message = ' '.join(str_data[1:])
 
-    if receiver[:1] != '@':
+    if receiver[:1] != '@' and receiver[:1] != '+':
         return HttpResponse("Invalid receiver")
-    receiver = receiver[1:]
+    if receiver[:1] == '+':
+        is_phone = True
+    else:
+        is_phone = False
+    if is_phone is False:
+        receiver = receiver[1:]
 
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
-<<<<<<< HEAD
-    return HttpResponse(chat_service.insert_message(sender, receiver, message))
+    print(is_phone)
 
+    if is_phone is True:
+        twilio_service.send_sms(receiver, message)
 
-=======
     is_tagged = detection_service.is_harrassment(message)
     row_id = chat_service.insert_message(sender, receiver, message)
 
@@ -128,10 +126,54 @@ def post_message(request):
 
     return HttpResponse(json.dumps(response))
 
+
 def on_incoming_sms(request):
-    number = request.POST.get("number", "+447706677871")
-    body = request.POST.get("body", "I love you <3")
-    message = twilio_service.send_sms(number, body)
-    return HttpResponse(message)
->>>>>>> b5970a934dc8d0d99095f59a8364dfe10ccdc9d6
+    print(request.POST)
+
+    sender = request.POST.get('From')
+    message = request.POST.get('Body')
+
+    if sender is None or message is None:
+        return HttpResponse()
+
+    if sender is None:
+        return HttpResponse()
+    if message is None:
+        return HttpResponse()
+
+    str_data = str.split(message)
+
+    chat_service.add_user(sender)
+
+    if len(str_data) < 2:
+        return HttpResponse()
+
+    receiver = str_data[0]
+    message = ' '.join(str_data[1:])
+
+    if receiver[:1] != '@' and receiver[:1] != '+':
+        return HttpResponse()
+    if receiver[:1] == '+':
+        is_phone = True
+    else:
+        is_phone = False
+    if is_phone is False:
+        receiver = receiver[1:]
+
+    if chat_service.user_exists(receiver) is None:
+        return HttpResponse()
+
+    if is_phone is True:
+        twilio_service.send_sms(receiver, message)
+
+    if chat_service.user_exists(receiver) is None:
+        return HttpResponse()
+
+    is_tagged = detection_service.is_harrassment(message)
+    chat_service.insert_message(sender, receiver, message)
+
+    if is_tagged == 1:
+        chat_service.set_user_tagged(sender)
+
+    return HttpResponse()
 

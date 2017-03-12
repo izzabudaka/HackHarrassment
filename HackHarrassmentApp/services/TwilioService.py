@@ -13,9 +13,11 @@ class TwilioService:
 
     def send_sms(self, number, message):
         if number is None or message is None:
+            print("no num/msg")
             return
 
         if self.is_valid_number(number) is False:
+            print("invalid num")
             return
         client = TwilioRestClient(account_sid, auth_token)
         message = client.messages.createmessage = client.messages.create(
