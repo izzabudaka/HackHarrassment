@@ -108,6 +108,8 @@ def post_message(request):
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
+    print(is_phone)
+
     if is_phone is True:
         twilio_service.send_sms(receiver, message)
 
@@ -132,25 +134,25 @@ def on_incoming_sms(request):
     message = request.POST.get('Body')
 
     if sender is None or message is None:
-        return
+        return HttpResponse()
 
     if sender is None:
-        return
+        return HttpResponse()
     if message is None:
-        return
+        return HttpResponse()
 
     str_data = str.split(message)
 
     chat_service.add_user(sender)
 
     if len(str_data) < 2:
-        return
+        return HttpResponse()
 
     receiver = str_data[0]
     message = ' '.join(str_data[1:])
 
     if receiver[:1] != '@' and receiver[:1] != '+':
-        return
+        return HttpResponse()
     if receiver[:1] == '+':
         is_phone = True
     else:
@@ -159,13 +161,13 @@ def on_incoming_sms(request):
         receiver = receiver[1:]
 
     if chat_service.user_exists(receiver) is None:
-        return
+        return HttpResponse()
 
     if is_phone is True:
         twilio_service.send_sms(receiver, message)
 
     if chat_service.user_exists(receiver) is None:
-        return
+        return HttpResponse()
 
     is_tagged = detection_service.is_harrassment(message)
     chat_service.insert_message(sender, receiver, message)
@@ -173,5 +175,5 @@ def on_incoming_sms(request):
     if is_tagged == 1:
         chat_service.set_user_tagged(sender)
 
-    return HttpResponse('')
+    return HttpResponse()
 
