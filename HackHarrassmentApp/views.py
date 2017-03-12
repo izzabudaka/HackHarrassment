@@ -1,19 +1,28 @@
 from django.http import HttpResponse
 import json
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 from HackHarrassmentApp.services.DetectionService import DetectionService
 from HackHarrassmentApp.services.Model import Model
 from HackHarrassmentApp.services.ReaderService import ReaderService
 from HackHarrassmentApp.services.ChatService import ChatService
 
-model = Model()
+tfidf_vect = TfidfVectorizer()
+model = Model(tfidf_vect)
 model.clean()
-detection_service = DetectionService(model.get_model())
+detection_service = DetectionService(model.get_model(), model.get_svm(), tfidf_vect)
 reader = ReaderService()
 chat_service = ChatService()
 
 
 def index(request):
+    print(detection_service.is_harrassment("Fuck You"))
+    print(detection_service.is_harrassment_svm("Fuck You"))
+
+    print(detection_service.is_harrassment("Beer is great"))
+    print(detection_service.is_harrassment_svm("Vodka is amazing"))
+
     return HttpResponse(detection_service.is_harrassment("Fuck You"))
 
 

@@ -1,10 +1,14 @@
-from nltk import word_tokenize
 from fuzzywuzzy import fuzz
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
+
+stop = set(stopwords.words('english'))
 
 
 class NLPService:
     def __init__(self):
-        pass
+        self.toker = RegexpTokenizer(r'((?<=[^\w\s])\w(?=[^\w\s])|(\W))+', gaps=True)
+
 
     def get_sentiment(self, text):
         pass
@@ -29,7 +33,8 @@ class NLPService:
         tokens = []
         true_class = []
         for c_id in convo_ids:
-            tokens.append(word_tokenize(convo_texts[c_id]))
+            current_tokens = self.toker.tokenize(convo_texts[c_id])
+            tokens.append([i for i in current_tokens if i not in stop])
             true_class.append(1 if convo_labels[c_id] == 'Y' else 0)
         labels = self.get_labels(tokens, all_labels)
         return labels, tokens, true_class

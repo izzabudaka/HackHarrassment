@@ -20,6 +20,24 @@ class ReaderService:
             if not file.startswith("."):
                 self.read_label_file(self.LABELS_DIR + file)
 
+    def read_other_data_file(self):
+        formed = xml.etree.ElementTree.parse(self.RESOURCE_DIR + "XMLMergedFile.xml").getroot().findall('FORMSPRINGID')
+        current = 0
+        for form in formed:
+            post = form.find('POST')
+            text = post.find('TEXT').text
+            labels = post.findall('LABELDATA')
+            total = 0
+            for label in labels:
+                total += 1 if label.find('ANSWER').text == 'Yes' else 0
+            if total > 2:
+                self.conversation_labels[current] = 'Y'
+            else:
+                self.conversation_labels[current] = 'N'
+            self.conversation_text[current] = text
+            current += 1
+        pass
+
     def read_data_files(self):
         convo_group_files = os.listdir(self.CONVERSATIONS_DIR)
         for file in convo_group_files:
@@ -33,7 +51,6 @@ class ReaderService:
 
     def read_label_file(self, filename):
         workbook = load_workbook(filename)
-        names = workbook.get_sheet_names()
         worksheet = workbook.get_sheet_names()[0]
         worksheet = workbook.get_sheet_by_name(worksheet)
         idx = 0

@@ -61,6 +61,7 @@ def get_splits(all_convos, harrassment_convos, labels, tokens, true_class):
 def main(argv):
     reader.read_labels()
     reader.read_data_files()
+    reader.read_other_data_file()
 
     convo_ids = reader.get_all_convos()
     harrass_convos = reader.get_harrassment_convos()
