@@ -17,13 +17,7 @@ chat_service = ChatService()
 
 
 def index(request):
-    print(detection_service.is_harrassment("Fuck You"))
-    print(detection_service.is_harrassment_svm("Fuck You"))
-
-    print(detection_service.is_harrassment("Beer is great"))
-    print(detection_service.is_harrassment_svm("Vodka is amazing"))
-
-    return HttpResponse(detection_service.is_harrassment("Fuck You"))
+    return HttpResponse(detection_service.is_harrassment(request.POST.get("txt")))
 
 
 def create_user(request):

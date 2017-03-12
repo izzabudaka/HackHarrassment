@@ -13,6 +13,7 @@ class ChatService:
             rowid = c.lastrowid
             conn.commit()
             conn.close()
+            self.create_relation_node(rowid, rowid)
         else:
             rowid = exists
         return rowid
