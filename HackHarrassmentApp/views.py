@@ -165,6 +165,5 @@ def on_incoming_sms(request):
     if is_tagged == 1:
         chat_service.set_user_tagged(sender)
 
-    chat_service.process_sms(sender, message)
     return HttpResponse('')
 
