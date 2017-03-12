@@ -99,6 +99,7 @@ class ChatService:
         c = conn.cursor()
 
         sender_id = self.user_exists(sender)
+        print(sender_id)
         receiver_id = self.user_exists(receiver)
 
         c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender_id, receiver_id, message, ))
