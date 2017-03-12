@@ -98,14 +98,17 @@ def post_message(request):
 
     if receiver[:1] != '@' and receiver[:1] != '+':
         return HttpResponse("Invalid receiver")
-    is_phone = receiver[:1] == '+'
-    if not is_phone:
+    if receiver[:1] == '+':
+        is_phone = True
+    else:
+        is_phone = False
+    if is_phone is False:
         receiver = receiver[1:]
 
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
-    if is_phone:
+    if is_phone is True:
         twilio_service.send_sms(receiver, message)
 
     is_tagged = detection_service.is_harrassment(message)
@@ -148,14 +151,17 @@ def on_incoming_sms(request):
 
     if receiver[:1] != '@' and receiver[:1] != '+':
         return
-    is_phone = receiver[:1] == '+'
-    if not is_phone:
+    if receiver[:1] == '+':
+        is_phone = True
+    else:
+        is_phone = False
+    if is_phone is False:
         receiver = receiver[1:]
 
     if chat_service.user_exists(receiver) is None:
         return
 
-    if is_phone:
+    if is_phone is True:
         twilio_service.send_sms(receiver, message)
 
     if chat_service.user_exists(receiver) is None:
