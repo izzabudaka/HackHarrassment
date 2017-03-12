@@ -138,6 +138,8 @@ def on_incoming_sms(request):
 
     str_data = str.split(message)
 
+    chat_service.add_user(sender)
+
     if len(str_data) < 2:
         return
 
