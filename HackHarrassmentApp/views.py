@@ -7,6 +7,7 @@ from HackHarrassmentApp.services.DetectionService import DetectionService
 from HackHarrassmentApp.services.Model import Model
 from HackHarrassmentApp.services.ReaderService import ReaderService
 from HackHarrassmentApp.services.ChatService import ChatService
+from HackHarrassmentApp.services.TwilioService import TwilioService
 
 tfidf_vect = TfidfVectorizer()
 model = Model(tfidf_vect)
@@ -14,6 +15,7 @@ model.clean()
 detection_service = DetectionService(model.get_model(), model.get_svm(), tfidf_vect)
 reader = ReaderService()
 chat_service = ChatService()
+twilio_service = TwilioService()
 
 
 def index(request):
@@ -114,5 +116,9 @@ def post_message(request):
 
     return HttpResponse(json.dumps(response))
 
-
+def on_incoming_sms(request):
+    number = request.POST.get("number", "+447706677871")
+    body = request.POST.get("body", "I love you <3")
+    message = twilio_service.send_sms(number, body)
+    return HttpResponse(message)
 
