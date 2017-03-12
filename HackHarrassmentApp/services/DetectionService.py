@@ -25,10 +25,12 @@ class DetectionService:
         tokens = self.toker.tokenize(text)
         tokens = [i for i in tokens if i not in stop]
         labels = text_mining.get_label(tokens, self.labels)
-        self.model.test([" ".join(tokens).strip()], [" ".join(labels).strip()])
-        _, topic_dist = self.model.results([self.labels_str])
         if len(labels) > 0:
             return 1
+        if len(tokens) <= 1:
+            return 0
+        self.model.test([" ".join(tokens).strip()], [" ".join(labels).strip()])
+        _, topic_dist = self.model.results([self.labels_str])
         result = classifer.classify(topic_dist)
         return result[0] if len(result) > 0 else 0
 

@@ -1,3 +1,6 @@
+import os
+import re
+import shutil
 import sys
 import topbox
 
@@ -23,11 +26,13 @@ def get_svm(posts, labels):
     tfidf_classifier.fit(tfidf_trans, labels)
     return tfidf_classifier
 
+
 def get_smt(tokens, labels):
     stmt = topbox.STMT('harrass_lda', epochs=10, mem=15000)
 
     stmt.train(tokens, labels)
     return stmt
+
 
 def get_splits(all_convos, harrassment_convos, labels, tokens, true_class):
     skf = KFold(n_splits=10)
@@ -91,7 +96,7 @@ def main(argv):
             shutil.rmtree('../topbox/box/harrass_lda_train')
         except:
             pass
-        
+
         smt = get_smt(train_tokens[idx], train_labels[idx])
         c_tokens = test_tokens[idx]
         l_tokens = test_labels[idx]
@@ -107,8 +112,12 @@ def main(argv):
         true_classes = test_true_class[idx]
 
         vote_predicted = []
+        if len(smt_predicted) > len(svm_predicted):
+            svm_predicted = svm_predicted[:len(smt_predicted)]
+        elif len(smt_predicted) < len(svm_predicted):
+            svm_predicted = svm_predicted[:len(smt_predicted)]
         for i in range(len(svm_predicted)):
-            if svm_predicted[i] == smt_predicted[i]:
+            if svm_predicted[i] == 1 or smt_predicted[i] == 1:
                 vote_predicted.append(1)
             else:
                 vote_predicted.append(0)
