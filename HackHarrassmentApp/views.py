@@ -117,8 +117,10 @@ def post_message(request):
     return HttpResponse(json.dumps(response))
 
 def on_incoming_sms(request):
+    print(request.POST)
+    print(request.GET)
     number = request.POST.get("number", "+447706677871")
     body = request.POST.get("body", "I love you <3")
-    message = twilio_service.send_sms(number, body)
-    return HttpResponse(message)
+    #message = twilio_service.send_sms(number, body)
+    return HttpResponse('das')
 
