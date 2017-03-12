@@ -12,8 +12,9 @@ class ChatService:
             c.execute("INSERT OR IGNORE INTO `chat_users`(`name`) VALUES(?)", (name,))
             rowid = c.lastrowid
             conn.commit()
+            c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (rowid, rowid,))
+            conn.commit()
             conn.close()
-            self.create_relation_node(rowid, rowid)
         else:
             rowid = exists
         return rowid
@@ -39,7 +40,10 @@ class ChatService:
         conn = self.get_conn()
         c = conn.cursor()
 
-        c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (user1, user2, ))
+        user_id1 = self.user_exists(user1)
+        user_id2 = self.user_exists(user2)
+
+        c.execute("INSERT INTO `chat_connections`(`user_id1`, `user_id2`) VALUES(?, ?)", (user_id1, user_id2, ))
         conn.commit()
         conn.close()
 
