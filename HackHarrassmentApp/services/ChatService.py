@@ -83,6 +83,15 @@ class ChatService:
         conn.close()
         return result
 
+    def latest_messages(self):
+        conn = self.get_conn()
+        c = conn.cursor()
+
+        c.execute("SELECT `id`, `sender`, `receiver`, `message` FROM `chat_messages` ORDER BY `id` DESC LIMIT 3")
+        result = c.fetchall()
+        conn.close()
+        return result
+
     def insert_message(self, sender, receiver, message):
         if self.user_exists(receiver) is None or self.user_exists(sender) is None:
             return

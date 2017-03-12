@@ -61,6 +61,19 @@ def get_latest_messages(request):
     return HttpResponse(json.dumps(messages))
 
 
+def last_messages(request):
+    result = chat_service.latest_messages()
+    messages = []
+    for message in result:
+        messages.append({
+            'id': message[0],
+            'sender': message[1],
+            'receiver': message[2],
+            'msg': message[3]
+        })
+    return HttpResponse(json.dumps(messages))
+
+
 def post_message(request):
     sender = request.POST.get('sender')
     message = request.POST.get('message')
