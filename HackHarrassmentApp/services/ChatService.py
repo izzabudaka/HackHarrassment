@@ -98,9 +98,9 @@ class ChatService:
         conn = self.get_conn()
         c = conn.cursor()
 
-        sender_id = self.user_exists(sender)
+        sender_id = self.user_exists(sender)[0]
         print(sender_id)
-        receiver_id = self.user_exists(receiver)
+        receiver_id = self.user_exists(receiver)[0] 
 
         c.execute("INSERT INTO `chat_messages`(`sender`, `receiver`, `message`) VALUES(?, ?, ?)", (sender_id, receiver_id, message, ))
         row_id = c.lastrowid
