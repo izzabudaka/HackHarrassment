@@ -112,14 +112,11 @@ def post_message(request):
     if chat_service.user_exists(receiver) is None:
         return HttpResponse('Receiver does not exist')
 
-<<<<<<< HEAD
-=======
     print(is_phone)
 
     if is_phone is True:
         twilio_service.send_sms(receiver, message)
 
->>>>>>> dd023fa2111c139cf6ce32b3a269153c86d9731e
     is_tagged = detection_service.is_harrassment(message)
     row_id = chat_service.insert_message(sender, receiver, message)
 
@@ -135,12 +132,9 @@ def post_message(request):
 
 
 def on_incoming_sms(request):
-<<<<<<< HEAD
     number = request.POST.get("number", "+447706677871")
     body = request.POST.get("body", "I love you <3")
-    message = twilio_service.send_sms(number, body)
-    return HttpResponse(message)
-=======
+
     print(request.POST)
 
     sender = request.POST.get('From')
@@ -189,5 +183,3 @@ def on_incoming_sms(request):
         chat_service.set_user_tagged(sender)
 
     return HttpResponse()
-
->>>>>>> dd023fa2111c139cf6ce32b3a269153c86d9731e
