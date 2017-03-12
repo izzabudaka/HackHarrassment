@@ -21,11 +21,6 @@ twilio_service = TwilioService()
 def index(request):
     return HttpResponse(detection_service.is_harrassment(request.POST.get("txt")))
 
-
-def lol(request):
-    return HttpResponse(1)
-
-
 def create_user(request):
     user = "".join(request.POST.get("name").split())
     if user is None:
@@ -132,9 +127,6 @@ def post_message(request):
 
 
 def on_incoming_sms(request):
-    number = request.POST.get("number", "+447706677871")
-    body = request.POST.get("body", "I love you <3")
-
     print(request.POST)
 
     sender = request.POST.get('From')
